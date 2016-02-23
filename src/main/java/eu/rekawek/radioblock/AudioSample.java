@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.Iterator;
 
@@ -29,6 +30,7 @@ public class AudioSample {
 
     public static AudioSample fromBuffer(int prePadding, byte[] buffer, int postPadding) throws IOException {
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+        byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
         AudioSample sample = new AudioSample(prePadding, shortBuffer.limit() / 2, new Iterable<Short>() {
             @Override

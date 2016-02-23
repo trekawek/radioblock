@@ -17,10 +17,10 @@ public class Main {
         for (String name : asList("commercial-start.raw", "commercial-end.raw")) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        JingleLocator locator = new JingleLocator(jingles);
+        JingleLocator locator = new JingleLocator(jingles, 200);
         locator.addListener(new JingleListener() {
             @Override
-            public void gotJingle(int index) {
+            public void gotJingle(int index, float level) {
                 System.out.println("Got jingle " + index);
             }
         });

@@ -22,13 +22,13 @@ public class MuteStream {
         for (String name : asList("commercial-start.raw", "commercial-end.raw")) {
             jingles.add(MuteStream.class.getClassLoader().getResourceAsStream(name));
         }
-        JingleLocator locator = new JingleLocator(jingles);
+        JingleLocator locator = new JingleLocator(jingles, 200);
         final MutableOutputStream mos = new MutableOutputStream(System.out);
         locator.addListener(new JingleListener() {
             @Override
-            public void gotJingle(int index) {
+            public void gotJingle(int index, float level) {
                 if (index == 0) {
-                    mos.setVolumeLevel(0.2f);
+                    mos.setVolumeLevel(0.1f);
                 } else {
                     mos.setVolumeLevel(1);
                 }

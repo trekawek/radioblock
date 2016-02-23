@@ -35,11 +35,15 @@ public class JingleLocator implements Runnable {
 
     private final List<JingleListener> listeners = new CopyOnWriteArrayList<JingleListener>();
 
+    private final int threshold;
+
     private volatile boolean running;
 
     private int jingleIndex;
 
-    public JingleLocator(final List<InputStream> jingleStreams) throws IOException {
+    public JingleLocator(final List<InputStream> jingleStreams, int threshold) throws IOException {
+        this.threshold = threshold;
+
         List<byte[]> jingleBuffers = new ArrayList<byte[]>();
         for (InputStream is : jingleStreams) {
             jingleBuffers.add(IOUtils.toByteArray(is));
@@ -116,14 +120,18 @@ public class JingleLocator implements Runnable {
         windowSample.doConjAndMultiply(jingles.get(jingleIndex));
         windowSample.doIfft();
         float result = windowSample.getMaxReal(2 * windowSize + 1);
-        LOG.debug("Result: {}", result);
 
-        if (result >= 150) {
-            LOG.debug("Found jingle: {}", jingleIndex);
+        if (result > threshold / 2) {
+            LOG.info("Result: {}", result);
+        } else {
+            LOG.debug("Result: {}", result);
+        }
+
+        if (result >= threshold) {
+            LOG.info("Found jingle: {}", jingleIndex);
             for (JingleListener listener : listeners) {
-                listener.gotJingle(jingleIndex);
+                listener.gotJingle(jingleIndex, result);
             }
-
             jingleIndex++;
             jingleIndex = jingleIndex % jingles.size();
         }
@@ -136,7 +144,7 @@ public class JingleLocator implements Runnable {
 
     public static interface JingleListener {
 
-        void gotJingle(int index);
+        void gotJingle(int index, float level);
 
     }
 }

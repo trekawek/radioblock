@@ -26,12 +26,12 @@ public class JingleLocatorTest {
             InputStream is = new FileInputStream(file);
             jingles.add(is);
         }
-        JingleLocator locator = new JingleLocator(jingles);
+        JingleLocator locator = new JingleLocator(jingles, 200);
 
         final List<Integer> foundJingles = new ArrayList<Integer>();
         locator.addListener(new JingleListener() {
             @Override
-            public void gotJingle(int index) {
+            public void gotJingle(int index, float level) {
                 foundJingles.add(index);
             }
         });

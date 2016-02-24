@@ -19,6 +19,8 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.apache.commons.io.input.TeeInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.rekawek.radioblock.JingleLocator;
 import eu.rekawek.radioblock.MutableOutputStream;
@@ -28,8 +30,12 @@ import javazoom.jl.decoder.JavaLayerException;
 
 public class Main {
 
+    private static final Logger LOG = LoggerFactory.getLogger(IceStreamReader.class);
+
     public static void main(String... args)
             throws IOException, UnsupportedAudioFileException, JavaLayerException, LineUnavailableException {
+        LOG.info("Starting stream");
+
         URL url = new URL("http://stream3.polskieradio.pl:8904/;stream");
         PipedInputStream pis = new PipedInputStream();
         PipedOutputStream pos = new PipedOutputStream(pis);

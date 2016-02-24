@@ -1,4 +1,4 @@
-package eu.rekawek.radioblock;
+package eu.rekawek.radioblock.standalone;
 
 import java.io.IOException;
 import java.io.OutputStream;

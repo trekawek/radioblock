@@ -77,6 +77,7 @@ public class IceStreamReader implements Runnable {
             buffer.clear_buffer();
         }
         socket.close();
+        os.close();
     }
 
     public void stop() {

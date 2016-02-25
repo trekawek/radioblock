@@ -28,14 +28,14 @@ public class AudioSample {
         }
     }
 
-    public static AudioSample fromBuffer(int prePadding, byte[] buffer, int postPadding) throws IOException {
+    public static AudioSample fromBuffer(final int channels, int prePadding, byte[] buffer, int postPadding) throws IOException {
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-        AudioSample sample = new AudioSample(prePadding, shortBuffer.limit() / 2, new Iterable<Short>() {
+        AudioSample sample = new AudioSample(prePadding, shortBuffer.limit() / channels, new Iterable<Short>() {
             @Override
             public Iterator<Short> iterator() {
-                return new PcmBufferIterator(shortBuffer);
+                return new PcmBufferIterator(channels, shortBuffer);
             }
         }, postPadding);
         return sample;

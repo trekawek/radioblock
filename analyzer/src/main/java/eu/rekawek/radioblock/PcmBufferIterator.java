@@ -7,8 +7,11 @@ public class PcmBufferIterator implements Iterator<Short> {
 
     private final ShortBuffer shortBuffer;
 
-    public PcmBufferIterator(ShortBuffer shortBuffer) {
+    private final int channels;
+
+    public PcmBufferIterator(int channels, ShortBuffer shortBuffer) {
         this.shortBuffer = shortBuffer;
+        this.channels = channels;
     }
 
     @Override
@@ -19,7 +22,9 @@ public class PcmBufferIterator implements Iterator<Short> {
     @Override
     public Short next() {
         short val = shortBuffer.get();
-        shortBuffer.get();
+        if (channels == 2) {
+            shortBuffer.get(); // drop the right channel for stereo
+        }
         return val;
     }
 }

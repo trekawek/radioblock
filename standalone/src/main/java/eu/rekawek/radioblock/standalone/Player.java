@@ -1,14 +1,10 @@
 package eu.rekawek.radioblock.standalone;
 
-import static java.util.Arrays.asList;
-
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -16,12 +12,11 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
-import org.apache.commons.io.input.TeeInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.rekawek.radioblock.JingleLocator;
-import eu.rekawek.radioblock.JingleLocator.JingleListener;
+import eu.rekawek.radioblock.MutingPipe;
+import eu.rekawek.radioblock.Rate;
 
 public class Player {
 
@@ -29,7 +24,7 @@ public class Player {
 
     private static final String URL = "http://stream3.polskieradio.pl:8904/;stream";
 
-    private final JingleLocator locator;
+    private final MutingPipe pipe;
 
     private SourceDataLine line;
 
@@ -38,11 +33,7 @@ public class Player {
     private Thread playerThread;
 
     public Player() throws IOException, LineUnavailableException {
-        List<InputStream> jingles = new ArrayList<InputStream>();
-        for (String name : asList("commercial-start-44.1k.raw", "commercial-end-44.1k.raw")) {
-            jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
-        }
-        locator = new JingleLocator(jingles, 200);
+        this.pipe = new MutingPipe(Rate.RATE_44_1);
     }
 
     public synchronized void start() {
@@ -81,18 +72,7 @@ public class Player {
         line.open(pcm);
         line.start();
 
-        final MutableOutputStream mos = new MutableOutputStream(new AudioOutputStream(line));
-        locator.addListener(new JingleListener() {
-            @Override
-            public void gotJingle(int index, float level) {
-                if (index == 0) {
-                    mos.setVolumeLevel(0.1f);
-                } else {
-                    mos.setVolumeLevel(1);
-                }
-            }
-        });
-        TeeInputStream tis = new TeeInputStream(pis, mos);
-        locator.analyse(tis);
+        OutputStream os = new AudioOutputStream(line);
+        pipe.copyStream(pis, os);
     }
 }

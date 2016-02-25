@@ -20,16 +20,19 @@ public class BufferedAudioAnalyzer implements Runnable {
 
     private int windowIndex;
 
-    public BufferedAudioAnalyzer(InputStream input, Listener listener, int bufferSize, int windowSize) {
+    private int channels;
+
+    public BufferedAudioAnalyzer(int channels, InputStream input, Listener listener, int bufferSize, int windowSize) {
         this.input = input;
         this.listener = listener;
         this.buffer = new short[bufferSize];
         this.windowSize = windowSize;
         this.windowIndex = windowSize - bufferSize;
+        this.channels = channels;
     }
 
     private void readLoop() throws IOException {
-        ByteBuffer buf = ByteBuffer.allocate(4);
+        ByteBuffer buf = ByteBuffer.allocate(2 * channels);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         while (true) {
             buf.clear();
@@ -41,7 +44,7 @@ public class BufferedAudioAnalyzer implements Runnable {
                 buf.put((byte) b);
             }
             buf.rewind();
-            short val = buf.getShort(); // just left channel
+            short val = buf.getShort(); // drop the right channel for stereo
             buffer[index++] = val;
             index = index % buffer.length;
 

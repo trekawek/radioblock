@@ -36,23 +36,27 @@ public class JingleLocator implements Runnable {
     private final List<JingleListener> listeners = new CopyOnWriteArrayList<JingleListener>();
 
     private final int threshold;
+    
+    private final int channels;
 
     private volatile boolean running;
 
     private int jingleIndex;
 
-    public JingleLocator(final List<InputStream> jingleStreams, int threshold) throws IOException {
+    public JingleLocator(final List<InputStream> jingleStreams, int channels, int threshold) throws IOException {
         this.threshold = threshold;
+        this.channels = channels;
 
         List<byte[]> jingleBuffers = new ArrayList<byte[]>();
         for (InputStream is : jingleStreams) {
             jingleBuffers.add(IOUtils.toByteArray(is));
         }
 
+        final int bytesPerSample = channels * 2;
         int maxSampleSize = 0;
         for (byte[] b : jingleBuffers) {
-            if (maxSampleSize < b.length / 4) {
-                maxSampleSize = (int) (b.length / 4);
+            if (maxSampleSize < b.length / bytesPerSample) {
+                maxSampleSize = (int) (b.length / bytesPerSample);
             }
         }
         int windowSize = (int) (maxSampleSize * 1.5);
@@ -60,7 +64,7 @@ public class JingleLocator implements Runnable {
 
         this.jingles = new ArrayList<AudioSample>(jingleStreams.size());
         for (byte[] b : jingleBuffers) {
-            AudioSample sample = AudioSample.fromBuffer((int) (b.length / 4) + windowSize - 1, b, next2Pow);
+            AudioSample sample = AudioSample.fromBuffer(channels, (int) (b.length / bytesPerSample) + windowSize - 1, b, next2Pow);
             sample.doFft();
             jingles.add(sample);
         }
@@ -74,7 +78,7 @@ public class JingleLocator implements Runnable {
     }
 
     public void analyse(InputStream is) {
-        BufferedAudioAnalyzer analyzer = new BufferedAudioAnalyzer(is, new Listener() {
+        BufferedAudioAnalyzer analyzer = new BufferedAudioAnalyzer(channels, is, new Listener() {
             @Override
             public void windowFull(Iterable<Short> window) {
                 try {

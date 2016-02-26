@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class MutableOutputStream extends OutputStream {
+public class MuteableOutputStream extends OutputStream {
 
     private final ByteBuffer buffer;
 
@@ -13,7 +13,7 @@ public class MutableOutputStream extends OutputStream {
 
     private volatile float volumeLevel = 1;
 
-    public MutableOutputStream(OutputStream os) {
+    public MuteableOutputStream(OutputStream os) {
         this.buffer = ByteBuffer.allocate(4);
         this.buffer.order(ByteOrder.LITTLE_ENDIAN);
         this.os = os;

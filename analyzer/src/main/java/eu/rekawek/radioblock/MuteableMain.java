@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MutableMain {
+public class MuteableMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(JingleLocator.class);
 

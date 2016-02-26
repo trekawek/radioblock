@@ -6,7 +6,12 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BufferedAudioAnalyzer implements Runnable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BufferedAudioAnalyzer.class);
 
     private final InputStream input;
 
@@ -69,7 +74,7 @@ public class BufferedAudioAnalyzer implements Runnable {
         try {
             readLoop();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Error in the loop", e);
         }
     }
 

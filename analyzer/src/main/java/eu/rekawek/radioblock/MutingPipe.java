@@ -25,7 +25,7 @@ public class MutingPipe {
     }
 
     public void copyStream(InputStream is, OutputStream os) {
-        final MutableOutputStream mos = new MutableOutputStream(os);
+        final MuteableOutputStream mos = new MuteableOutputStream(os);
         locator.addListener(new JingleListener() {
             @Override
             public void gotJingle(int index, float level) {

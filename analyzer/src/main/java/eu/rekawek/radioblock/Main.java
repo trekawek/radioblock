@@ -28,7 +28,7 @@ public class Main {
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        JingleLocator locator = new JingleLocator(jingles, rate.getChannels(), 200);
+        JingleLocator locator = new JingleLocator(jingles, rate.getChannels(), 100);
         locator.addListener(new JingleListener() {
             @Override
             public void gotJingle(int index, float level) {

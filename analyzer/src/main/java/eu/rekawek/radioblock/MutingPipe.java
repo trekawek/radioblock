@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.input.TeeInputStream;
@@ -21,7 +22,7 @@ public class MutingPipe {
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        locator = new JingleLocator(jingles, rate.getChannels(), 200);
+        locator = new JingleLocator(jingles, Arrays.asList(200, 200), rate.getChannels());
     }
 
     public void copyStream(InputStream is, OutputStream os) {

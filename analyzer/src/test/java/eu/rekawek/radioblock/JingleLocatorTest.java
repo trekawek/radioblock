@@ -43,7 +43,7 @@ public class JingleLocatorTest {
             InputStream is = new FileInputStream(file);
             jingles.add(is);
         }
-        JingleLocator locator = new JingleLocator(jingles, rate.getChannels(), 200);
+        JingleLocator locator = new JingleLocator(jingles, Arrays.asList(200, 200), rate.getChannels());
 
         final List<Integer> foundJingles = new ArrayList<Integer>();
         locator.addListener(new JingleListener() {

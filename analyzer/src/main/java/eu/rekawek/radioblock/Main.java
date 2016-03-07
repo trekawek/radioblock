@@ -18,17 +18,17 @@ public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(JingleLocator.class);
 
     public static void main(String... args) throws IOException, URISyntaxException {
-        Rate rate = Rate.RATE_48;
-        if (args.length == 1) {
-            rate = Rate.valueOf(args[0]);
-        }
-        LOG.info("Using rate {}", rate);
+        Rate rate = Rate.valueOf(args[0]);
+        List<Integer> thresholds = new ArrayList<Integer>();
+        thresholds.add(Integer.parseInt(args[1]));
+        thresholds.add(Integer.parseInt(args[2]));
+        LOG.info("Using rate {}, thresholds {}", rate, thresholds);
 
         List<InputStream> jingles = new ArrayList<InputStream>();
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        JingleLocator locator = new JingleLocator(jingles, rate.getChannels(), 100);
+        JingleLocator locator = new JingleLocator(jingles, thresholds, rate.getChannels());
         locator.addListener(new JingleListener() {
             @Override
             public void gotJingle(int index, float level) {

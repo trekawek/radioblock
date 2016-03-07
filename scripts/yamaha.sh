@@ -4,7 +4,7 @@ HOST=192.168.1.101
 
 post() {
   local data="$1"
-  curl -s -d "$data" "$HOST/YamahaRemoteControl/ctrl"
+  curl -s -d "$data" "$HOST/YamahaRemoteControl/ctrl" | tee last_command.log
 }
 
 set_volume() {
@@ -20,7 +20,7 @@ get_volume() {
 
 is_radio() {
   local xml=$(post '<?xml version="1.0" encoding="utf-8"?><YAMAHA_AV cmd="GET"><Tuner><Play_Info>GetParam</Play_Info></Tuner></YAMAHA_AV>')
-  [[ "$xml" == *"TROJKA"* ]] && echo "1" || echo "0"
+  [[ "$xml" == *"8950"* ]] && [[ "$xml" == *"Assert"* ]] && echo "1" || echo "0"
 }
 
 case "$1" in

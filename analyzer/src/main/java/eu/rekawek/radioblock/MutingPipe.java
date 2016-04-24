@@ -22,7 +22,7 @@ public class MutingPipe {
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        locator = new JingleLocator(jingles, Arrays.asList(200, 200), rate.getChannels());
+        locator = new JingleLocator(jingles, Arrays.asList(300, 400), rate.getChannels());
     }
 
     public void copyStream(InputStream is, OutputStream os) {

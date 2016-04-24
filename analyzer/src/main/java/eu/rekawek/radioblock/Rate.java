@@ -9,7 +9,7 @@ public enum Rate {
 
     private final int channels;
 
-    private Rate(int channels, String... samples) {
+    Rate(int channels, String... samples) {
         this.samples = samples;
         this.channels = channels;
     }

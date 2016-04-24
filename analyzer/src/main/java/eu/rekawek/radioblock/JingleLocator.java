@@ -94,8 +94,9 @@ public class JingleLocator implements Runnable {
         t.start();
 
         analyzer.run();
-
+        LOG.info("Analyzer has finished");
         running = false;
+
         try {
             t.join();
         } catch (InterruptedException e) {
@@ -146,7 +147,7 @@ public class JingleLocator implements Runnable {
         return (long) pow(2, exp);
     }
 
-    public static interface JingleListener {
+    public interface JingleListener {
 
         void gotJingle(int index, float level);
 

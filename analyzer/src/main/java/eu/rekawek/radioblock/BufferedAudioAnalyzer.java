@@ -78,7 +78,7 @@ public class BufferedAudioAnalyzer implements Runnable {
         }
     }
 
-    public static interface Listener {
+    public interface Listener {
         void windowFull(Iterable<Short> window);
     }
 }

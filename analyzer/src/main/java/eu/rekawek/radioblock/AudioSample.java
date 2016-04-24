@@ -85,9 +85,4 @@ public class AudioSample {
         }
         return max;
     }
-
-    public int getLength() {
-        return sampleLength;
-    }
-
 }

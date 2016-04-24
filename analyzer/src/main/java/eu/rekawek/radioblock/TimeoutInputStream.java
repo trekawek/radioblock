@@ -145,10 +145,11 @@ public class TimeoutInputStream extends InputStream {
             long waitUntil = System.currentTimeMillis() + timeoutMillis;
             while (this.state != state) {
                 long now = System.currentTimeMillis();
-                if (now > waitUntil) {
+                if (now < waitUntil) {
+                    wait(waitUntil - now);
+                } else {
                     return false;
                 }
-                wait(waitUntil - now);
             }
             return true;
         }

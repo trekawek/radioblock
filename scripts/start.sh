@@ -31,6 +31,11 @@ do
     echo
   fi
 
+  if [ "$ANALYZER_PID" -ne 0 ] && ! pgrep -f "analyzer-1.0.0-SNAPSHOT.jar" > /dev/null 2>&1; then
+    echo "$(date) java analyzer has died"
+    stop_analyzer
+  fi
+
   if [ "$RADIO_TTL" -ne 0 ] && [ "$ANALYZER_PID" -eq 0 ]; then
     start_analyzer
   elif [ "$RADIO_TTL" -eq 0 ] && [ "$ANALYZER_PID" -ne 0 ]; then

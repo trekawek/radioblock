@@ -3,7 +3,7 @@
 MUTE=10
 
 /storage/bin/rtl_fm -f 89.5M -M wbfm \
- | /storage/java/bin/java -jar /storage/.radioblock/analyzer-1.0.0-SNAPSHOT.jar RATE_32_MONO 80 120  \
+ | /storage/java/bin/java -jar /storage/.radioblock/analyzer-1.0.0-SNAPSHOT.jar RATE_32_MONO 80 90  \
  | while read line
 do
   if [ "$line" == "Got jingle 0" ]; then

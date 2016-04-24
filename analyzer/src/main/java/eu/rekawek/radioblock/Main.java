@@ -32,9 +32,10 @@ public class Main {
         locator.addListener(new JingleListener() {
             @Override
             public void gotJingle(int index, float level) {
-                System.out.println("Got jingle " + index);
+             System.out.println("Got jingle " + index);
             }
         });
-        locator.analyse(System.in);
+        locator.analyse(new TimeoutInputStream(System.in, 1000));
+        System.exit(0);
     }
 }

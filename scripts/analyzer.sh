@@ -2,7 +2,7 @@
 
 MUTE=10
 
-/storage/bin/rtl_fm -f 89.5M -M wbfm \
+/storage/bin/rtl_fm -M wbfm -f 89.5M -g 0 \
  | /storage/java/bin/java -jar /storage/.radioblock/analyzer-1.0.0-SNAPSHOT.jar RATE_32_MONO 80 90  \
  | while read line
 do

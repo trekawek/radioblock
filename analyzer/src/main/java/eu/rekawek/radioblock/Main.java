@@ -35,7 +35,11 @@ public class Main {
              System.out.println("Got jingle " + index);
             }
         });
-        locator.analyse(new TimeoutInputStream(System.in, 1000));
-        System.exit(0);
+        locator.analyse(new FuseInputStream(System.in, 1000, new Runnable() {
+            @Override
+            public void run() {
+                System.exit(0);
+            }
+        }));
     }
 }

@@ -8,6 +8,10 @@ import javax.swing.JFrame;
 public class Main {
 
     public static void main(String... args) throws IOException, LineUnavailableException {
+        if (args.length > 0 && "--cli".equals(args[0])) {
+            MainCli.main(args);
+        }
+
         final Player player = new Player();
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {

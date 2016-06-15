@@ -22,7 +22,7 @@ public class MutingPipe {
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        locator = new JingleLocator(jingles, Arrays.asList(300, 400), rate.getChannels());
+        locator = new JingleLocator(jingles, Arrays.asList(500, 800), rate.getChannels());
     }
 
     public void copyStream(InputStream is, OutputStream os) {
@@ -31,7 +31,7 @@ public class MutingPipe {
             @Override
             public void gotJingle(int index, float level) {
                 if (index == 0) {
-                    mos.setVolumeLevel(0.1f);
+                    mos.setVolumeLevel(0.05f);
                 } else {
                     mos.setVolumeLevel(1);
                 }

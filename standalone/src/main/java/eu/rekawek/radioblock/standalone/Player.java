@@ -22,7 +22,7 @@ public class Player {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    private static final String URL = "http://stream3.polskieradio.pl:8904/;stream";
+    public static final String URL = "http://stream3.polskieradio.pl:8904/;stream";
 
     private final MutingPipe pipe;
 

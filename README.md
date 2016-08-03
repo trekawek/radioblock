@@ -9,7 +9,13 @@ AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojk
     ffmpeg -loglevel -8 \
            -i http://stream3.polskieradio.pl:8904/\;stream \
            -f s16le -acodec pcm_s16le - \
-      | java -cp analyzer-1.0.0-SNAPSHOT.jar eu.rekawek.radioblock.Main RATE_44_1 \
+      | java -jar analyzer-1.0.0-SNAPSHOT.jar RATE_44_1 500 800
+
+500 and 800 are the thresholds for detecting ad start/stop jingle. Possible rate values:
+
+* RATE_32_MONO,
+* RATE_44_1,
+* RATE_48.
 
 ### Case 2 - muting ads
 

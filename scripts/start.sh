@@ -1,4 +1,4 @@
-#!/storage/bin/bash-static
+#!/bin/bash
 
 ANALYZER_PID=0
 RADIO_TTL=0

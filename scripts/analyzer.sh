@@ -1,4 +1,4 @@
-#!/storage/bin/bash-static
+#!/bin/bash
 
 MUTE=10
 

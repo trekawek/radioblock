@@ -1,4 +1,4 @@
-#!/storage/bin/bash-static
+#!/bin/bash
 
 HOST=192.168.1.105
 

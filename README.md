@@ -1,6 +1,6 @@
 # RadioBlock
 
-AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojka). Uses cross correlation to find ad jingles and mutes the whole ads block. More info can be found in a [blog post](http://blog.rekawek.eu/2016/02/24/radio-adblock/).
+AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojka). Uses cross correlation to find ad jingles and mutes the whole ads block. More info can be found in a blog post: [part 1](http://blog.rekawek.eu/2016/02/24/radio-adblock/), [part 2](http://blog.rekawek.eu/2016/02/27/radio-adblock-2/).
 
 ## Usage
 

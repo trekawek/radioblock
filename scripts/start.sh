@@ -3,7 +3,7 @@
 ANALYZER_PID=0
 RADIO_TTL=0
 
-cd /storage/.radioblock
+cd /usr/local/bin/radioblock
 
 start_analyzer() {
   ./analyzer.sh &
@@ -27,8 +27,6 @@ do
   elif [ "$RADIO_TTL" -gt 0  ]; then
     RADIO_TTL="$((RADIO_TTL-1))"
     echo "$(date) radio is disabled"
-    cat last_command.log
-    echo
   fi
 
   if [ "$ANALYZER_PID" -ne 0 ] && ! pgrep -f "analyzer-1.0.0-SNAPSHOT.jar" > /dev/null 2>&1; then

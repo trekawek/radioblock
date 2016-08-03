@@ -1,10 +1,10 @@
 #!/bin/bash
 
-HOST=192.168.1.105
+HOST=192.168.0.10
 
 post() {
   local data="$1"
-  curl -s -d "$data" "$HOST/YamahaRemoteControl/ctrl" | tee last_command.log
+  curl -s -d "$data" "$HOST/YamahaRemoteControl/ctrl"
 }
 
 set_volume() {

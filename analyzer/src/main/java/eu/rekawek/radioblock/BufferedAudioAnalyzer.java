@@ -15,6 +15,8 @@ public class BufferedAudioAnalyzer implements Runnable {
 
     private final InputStream input;
 
+    private final byte[] rawBuffer = new byte[4096];
+
     private final short[] buffer;
 
     private final int windowSize;
@@ -40,22 +42,23 @@ public class BufferedAudioAnalyzer implements Runnable {
         ByteBuffer buf = ByteBuffer.allocate(2 * channels);
         buf.order(ByteOrder.LITTLE_ENDIAN);
         while (true) {
-            buf.clear();
-            for (int i = 0; i < buf.capacity(); i++) {
-                int b = input.read();
-                if (b == -1) {
-                    return;
-                }
-                buf.put((byte) b);
+            int n = input.read(rawBuffer);
+            if (n == -1) {
+                break;
             }
-            buf.rewind();
-            short val = buf.getShort(); // drop the right channel for stereo
-            buffer[index++] = val;
-            index = index % buffer.length;
 
-            if (++windowIndex == windowSize) {
-                broadcast();
-                windowIndex = 0;
+            for (int i = 0; i < n; i += buf.capacity()) {
+                buf.clear();
+                buf.put(rawBuffer, i, buf.capacity());
+                buf.rewind();
+                short val = buf.getShort(); // drop the right channel for stereo
+                buffer[index++] = val;
+                index = index % buffer.length;
+
+                if (++windowIndex == windowSize) {
+                    broadcast();
+                    windowIndex = 0;
+                }
             }
         }
     }

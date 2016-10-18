@@ -17,26 +17,31 @@ public class MutingPipe {
 
     private final JingleLocator locator;
 
+    private final List<JingleListener> listeners;
+
     public MutingPipe(Rate rate) throws IOException {
         List<InputStream> jingles = new ArrayList<InputStream>();
         for (String name : asList(rate.getSamples())) {
             jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
         }
-        locator = new JingleLocator(jingles, Arrays.asList(500, 800), rate.getChannels());
+        locator = new JingleLocator(jingles, Arrays.asList(500, 550), rate.getChannels());
+        listeners = new ArrayList<>();
+    }
+
+    public void addListener(JingleListener listener) {
+        listeners.add(listener);
     }
 
     public void copyStream(InputStream is, OutputStream os) {
         final MuteableOutputStream mos = new MuteableOutputStream(os);
-        locator.addListener(new JingleListener() {
-            @Override
-            public void gotJingle(int index, float level) {
-                if (index == 0) {
-                    mos.setVolumeLevel(0.05f);
-                } else {
-                    mos.setVolumeLevel(1);
-                }
+        locator.addListener((index, level) -> {
+            if (index == 0) {
+                mos.setVolumeLevel(0.01f);
+            } else {
+                mos.setVolumeLevel(1);
             }
         });
+        listeners.forEach(locator::addListener);
         TeeInputStream tis = new TeeInputStream(is, mos);
         locator.analyse(tis);
     }

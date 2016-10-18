@@ -10,6 +10,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import eu.rekawek.radioblock.JingleLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,10 @@ public class Player {
             }
             playerThread = null;
         }
+    }
+
+    public void addListener(JingleLocator.JingleListener listener) {
+        pipe.addListener(listener);
     }
 
     private void doStart() throws LineUnavailableException, IOException, UnsupportedAudioFileException {

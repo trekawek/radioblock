@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.prefs.Preferences;
 
+import static eu.rekawek.radioblock.standalone.Main.SHOW_WINDOW_PROP;
+
 public class PlayerGui extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = -1162567178177329163L;
@@ -56,9 +58,9 @@ public class PlayerGui extends JPanel implements ActionListener {
         stopItem.addActionListener(this);
 
         showWindowItem = new CheckboxMenuItem("Show window");
-        showWindowItem.setState(prefs.getBoolean("showWindow", true));
+        showWindowItem.setState(prefs.getBoolean(SHOW_WINDOW_PROP, true));
         showWindowItem.addItemListener(l -> {
-            prefs.putBoolean("showWindow", showWindowItem.getState());
+            prefs.putBoolean(SHOW_WINDOW_PROP, showWindowItem.getState());
             toggleWindow();
         });
 

@@ -10,6 +10,8 @@ import javax.swing.JFrame;
 
 public class Main {
 
+    public static final String SHOW_WINDOW_PROP = "showWindow";
+
     public static void main(String... args) throws IOException, LineUnavailableException, UnsupportedAudioFileException, AWTException {
         if (args.length > 0 && "--cli".equals(args[0])) {
             MainCli.main(args);
@@ -18,6 +20,9 @@ public class Main {
 
         final Player player = new Player();
         final Preferences prefs = Preferences.userRoot().node(Main.class.getName());
+        if (!prefs.getBoolean(SHOW_WINDOW_PROP, true)) {
+            System.setProperty("apple.awt.UIElement", "true");
+        }
 
         javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI(player, prefs));
     }
@@ -33,7 +38,7 @@ public class Main {
 
         frame.pack();
         frame.setResizable(false);
-        frame.setVisible(prefs.getBoolean("showWindow", true));
+        frame.setVisible(prefs.getBoolean(SHOW_WINDOW_PROP, true));
     }
 
 }

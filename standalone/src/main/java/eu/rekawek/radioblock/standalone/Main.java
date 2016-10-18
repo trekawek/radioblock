@@ -3,11 +3,12 @@ package eu.rekawek.radioblock.standalone;
 import java.io.IOException;
 
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
 
 public class Main {
 
-    public static void main(String... args) throws IOException, LineUnavailableException {
+    public static void main(String... args) throws IOException, LineUnavailableException, UnsupportedAudioFileException {
         if (args.length > 0 && "--cli".equals(args[0])) {
             MainCli.main(args);
         }

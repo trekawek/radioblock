@@ -2,15 +2,13 @@ package eu.rekawek.radioblock.standalone;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.net.URL;
 
-import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +20,16 @@ public class Player {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    public static final String URL = "http://stream3.polskieradio.pl:8904/;stream";
-
     private final MutingPipe pipe;
 
     private SourceDataLine line;
 
-    private IceStreamReader reader;
-
     private Thread playerThread;
 
+    private AudioInputStream radioStream;
+
     public Player() throws IOException, LineUnavailableException {
-        this.pipe = new MutingPipe(Rate.RATE_44_1);
+        this.pipe = new MutingPipe(Rate.RATE_48);
     }
 
     public synchronized void start() {
@@ -54,25 +50,24 @@ public class Player {
 
     public synchronized void stop() {
         if (playerThread != null && playerThread.isAlive()) {
-            reader.stop();
             line.stop();
+            try {
+                radioStream.close();
+            } catch (IOException e) {
+                LOG.error("Can't close OGG input stream", e);
+            }
+            playerThread = null;
         }
     }
 
-    private void doStart() throws LineUnavailableException, IOException {
-        PipedInputStream pis = new PipedInputStream();
-        PipedOutputStream pos = new PipedOutputStream(pis);
-
-        reader = new IceStreamReader(new URL(URL), 96000, pos);
-        new Thread(reader).start();
-
-        AudioFormat pcm = new AudioFormat(44100, 16, 2, true, false);
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, pcm);
+    private void doStart() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        radioStream = RadioStreamProvider.getStream();
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, radioStream.getFormat());
         line = (SourceDataLine) AudioSystem.getLine(info);
-        line.open(pcm);
+        line.open(radioStream.getFormat());
         line.start();
 
         OutputStream os = new AudioOutputStream(line);
-        pipe.copyStream(pis, os);
+        pipe.copyStream(radioStream, os);
     }
 }

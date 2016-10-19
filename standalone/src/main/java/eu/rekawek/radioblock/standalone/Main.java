@@ -36,6 +36,7 @@ public class Main {
         newContentPane.setOpaque(false);
         frame.setContentPane(newContentPane);
 
+        frame.setMinimumSize(new Dimension(300, 0));
         frame.pack();
         frame.setResizable(false);
         frame.setVisible(prefs.getBoolean(SHOW_WINDOW_PROP, true));

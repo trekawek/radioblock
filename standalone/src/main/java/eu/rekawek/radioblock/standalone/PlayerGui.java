@@ -1,9 +1,13 @@
 package eu.rekawek.radioblock.standalone;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.prefs.Preferences;
 
 import static eu.rekawek.radioblock.standalone.Main.SHOW_WINDOW_PROP;
@@ -12,9 +16,9 @@ public class PlayerGui extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = -1162567178177329163L;
 
-    private static final Image NORMAL_ICON = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/icon215x215.png"));
+    private static final Image NORMAL_ICON = getIcon("icon215x215.png");
 
-    private static final Image MUTE_ICON = Toolkit.getDefaultToolkit().getImage(Main.class.getResource("/icon215x215-mute.png"));
+    private static final Image MUTE_ICON = getIcon("icon215x215-mute.png");
 
     private final JButton startButton;
 
@@ -126,5 +130,15 @@ public class PlayerGui extends JPanel implements ActionListener {
     private void toggleWindow() {
         JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         topFrame.setVisible(showWindowItem.getState());
+    }
+
+    private static Image getIcon(String name) {
+        try {
+            BufferedImage trayIconImage = ImageIO.read(PlayerGui.class.getResource("/" + name));
+            int trayIconWidth = new TrayIcon(trayIconImage).getSize().width;
+            return trayIconImage.getScaledInstance(trayIconWidth, -1, Image.SCALE_SMOOTH);
+        } catch(IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }

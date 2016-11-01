@@ -3,10 +3,13 @@ package eu.rekawek.radioblock;
 import static java.lang.Math.ceil;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -47,27 +50,18 @@ public class JingleLocator implements Runnable {
         this.thresholds = thresholds;
         this.channels = channels;
 
-        List<byte[]> jingleBuffers = new ArrayList<byte[]>();
-        for (InputStream is : jingleStreams) {
-            jingleBuffers.add(IOUtils.toByteArray(is));
-        }
+        List<byte[]> jingleBuffers = jingleStreams.stream().map(JingleLocator::toByteArray).collect(toList());
 
         final int bytesPerSample = channels * 2;
-        int maxSampleSize = 0;
-        for (byte[] b : jingleBuffers) {
-            if (maxSampleSize < b.length / bytesPerSample) {
-                maxSampleSize = (int) (b.length / bytesPerSample);
-            }
-        }
+        int maxSampleSize = jingleBuffers.stream().map(b -> b.length / bytesPerSample).max(Comparator.naturalOrder()).orElse(0);
         int windowSize = (int) (maxSampleSize * 1.5);
         int next2Pow = (int) next2Pow(windowSize * 2 - 1);
 
-        this.jingles = new ArrayList<AudioSample>(jingleStreams.size());
-        for (byte[] b : jingleBuffers) {
-            AudioSample sample = AudioSample.fromBuffer(channels, (int) (b.length / bytesPerSample) + windowSize - 1, b, next2Pow);
-            sample.doFft();
-            jingles.add(sample);
-        }
+        this.jingles = jingleBuffers.stream()
+                .map(b -> AudioSample.fromBuffer(channels, b.length / bytesPerSample + windowSize - 1, b, next2Pow))
+                .map(AudioSample::doFft)
+                .collect(toList());
+
         this.windowSize = windowSize;
         this.maxSampleSize = maxSampleSize;
         this.next2Pow = next2Pow;
@@ -78,14 +72,11 @@ public class JingleLocator implements Runnable {
     }
 
     public void analyse(InputStream is) {
-        BufferedAudioAnalyzer analyzer = new BufferedAudioAnalyzer(channels, is, new Listener() {
-            @Override
-            public void windowFull(Iterable<Short> window) {
-                try {
-                    samples.put(new AudioSample(0, windowSize, window, next2Pow));
-                } catch (InterruptedException e) {
-                    LOG.error("Interrupted put operation", e);
-                }
+        BufferedAudioAnalyzer analyzer = new BufferedAudioAnalyzer(channels, is, window -> {
+            try {
+                samples.put(new AudioSample(0, windowSize, window, next2Pow));
+            } catch (InterruptedException e) {
+                LOG.error("Interrupted put operation", e);
             }
         }, windowSize, windowSize - maxSampleSize);
 
@@ -134,9 +125,7 @@ public class JingleLocator implements Runnable {
 
         if (result >= thresholds.get(jingleIndex)) {
             LOG.info("Found jingle: {}", jingleIndex);
-            for (JingleListener listener : listeners) {
-                listener.gotJingle(jingleIndex, result);
-            }
+            listeners.forEach(l -> l.gotJingle(jingleIndex, result));
             jingleIndex++;
             jingleIndex = jingleIndex % jingles.size();
         }
@@ -145,6 +134,14 @@ public class JingleLocator implements Runnable {
     public static long next2Pow(long x) {
         double exp = ceil(log(x) / log(2));
         return (long) pow(2, exp);
+    }
+
+    private static byte[] toByteArray(InputStream is) {
+        try {
+            return IOUtils.toByteArray(is);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public interface JingleListener {

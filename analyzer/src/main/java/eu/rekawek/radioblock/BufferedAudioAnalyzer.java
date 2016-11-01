@@ -64,12 +64,7 @@ public class BufferedAudioAnalyzer implements Runnable {
     }
 
     private void broadcast() {
-        listener.windowFull(new Iterable<Short>() {
-            @Override
-            public Iterator<Short> iterator() {
-                return new WrappedArrayIterator(buffer, index);
-            }
-        });
+        listener.windowFull(() -> new WrappedArrayIterator(buffer, index));
     }
 
     @Override

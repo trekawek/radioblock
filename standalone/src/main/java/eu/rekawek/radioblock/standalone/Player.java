@@ -11,10 +11,10 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.rekawek.radioblock.JingleLocator;
+import eu.rekawek.radioblock.MutingPipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.rekawek.radioblock.MutingPipe;
 import eu.rekawek.radioblock.Rate;
 
 public class Player {
@@ -37,13 +37,11 @@ public class Player {
         if (playerThread != null && playerThread.isAlive()) {
             return;
         }
-        playerThread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    doStart();
-                } catch (Exception e) {
-                    LOG.error("Can't start player", e);
-                }
+        playerThread = new Thread(() -> {
+            try {
+                doStart();
+            } catch (Exception e) {
+                LOG.error("Can't start player", e);
             }
         });
         playerThread.start();

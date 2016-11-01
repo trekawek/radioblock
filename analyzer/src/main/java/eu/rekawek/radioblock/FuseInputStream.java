@@ -16,22 +16,19 @@ public class FuseInputStream extends InputStream {
 
     public FuseInputStream(InputStream is, final long timeoutMillis, final Runnable callback) {
         this.is = is;
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        alive = false;
-                        Thread.sleep(timeoutMillis);
-                        if (!alive) {
-                            LOG.info("No activity for {}ms", timeoutMillis);
-                            callback.run();
-                            break;
-                        }
-                    } catch (InterruptedException e) {
-                        LOG.error("Interrupted fuse loop", e);
+        Thread t = new Thread(() -> {
+            while (true) {
+                try {
+                    alive = false;
+                    Thread.sleep(timeoutMillis);
+                    if (!alive) {
+                        LOG.info("No activity for {}ms", timeoutMillis);
+                        callback.run();
                         break;
                     }
+                } catch (InterruptedException e) {
+                    LOG.error("Interrupted fuse loop", e);
+                    break;
                 }
             }
         });

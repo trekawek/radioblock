@@ -1,6 +1,7 @@
 package eu.rekawek.radioblock;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +21,7 @@ public class MutingPipe {
     private final List<JingleListener> listeners;
 
     public MutingPipe(Rate rate) throws IOException {
-        List<InputStream> jingles = new ArrayList<InputStream>();
-        for (String name : asList(rate.getSamples())) {
-            jingles.add(Main.class.getClassLoader().getResourceAsStream(name));
-        }
+        List<InputStream> jingles = asList(rate.getSamples()).stream().map(MutingPipe.class.getClassLoader()::getResourceAsStream).collect(toList());
         locator = new JingleLocator(jingles, Arrays.asList(500, 550), rate.getChannels());
         listeners = new ArrayList<>();
     }

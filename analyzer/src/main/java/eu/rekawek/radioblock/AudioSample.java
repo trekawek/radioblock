@@ -3,6 +3,7 @@ package eu.rekawek.radioblock;
 import static java.lang.Math.max;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -28,7 +29,7 @@ public class AudioSample {
         }
     }
 
-    public static AudioSample fromBuffer(final int channels, int prePadding, byte[] buffer, int postPadding) throws IOException {
+    public static AudioSample fromBuffer(final int channels, int prePadding, byte[] buffer, int postPadding) {
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
         byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         final ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
@@ -41,9 +42,10 @@ public class AudioSample {
         return sample;
     }
 
-    public void doFft() {
+    public AudioSample doFft() {
         FloatFFT_1D fft = new FloatFFT_1D(sampleLength);
         fft.realForwardFull(buffer);
+        return this;
     }
 
     public void doConjAndMultiply(AudioSample sample) {
@@ -66,14 +68,6 @@ public class AudioSample {
     public void doIfft() {
         FloatFFT_1D fft = new FloatFFT_1D(sampleLength);
         fft.complexInverse(buffer, true);
-    }
-
-    public float[] getReal(int length) {
-        float[] result = new float[length];
-        for (int i = 0; i < length; i++) {
-            result[i] = buffer[i * 2];
-        }
-        return result;
     }
 
     public float getMaxReal(int range) {

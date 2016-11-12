@@ -5,6 +5,7 @@ import eu.rekawek.radioblock.standalone.view.PlayerTrayIcon;
 import eu.rekawek.radioblock.standalone.view.PlayerWindow;
 
 import javax.sound.sampled.LineUnavailableException;
+import javax.swing.*;
 import java.io.IOException;
 
 public class PlayerController implements PlayerWindow.PlayerWindowListener, PlayerTrayIcon.PlayerTrayListener {
@@ -55,7 +56,10 @@ public class PlayerController implements PlayerWindow.PlayerWindowListener, Play
         window.toggleButton(false);
         trayIcon.toggleButton(false);
         clearStats();
-        player.start();
+        player.start(() -> {
+            JOptionPane.showMessageDialog(new JFrame(), "Can't start streaming.", "Error", JOptionPane.ERROR_MESSAGE);
+            stopPlayer();
+        });
     }
 
     @Override

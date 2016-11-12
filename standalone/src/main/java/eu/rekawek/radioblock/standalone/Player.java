@@ -1,9 +1,11 @@
 package eu.rekawek.radioblock.standalone;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
@@ -20,29 +22,43 @@ public class Player {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    private final MutingPipe pipe;
+    private final List<JingleLocator.JingleListener> listeners = new ArrayList<>();
+
+    private MutingPipe pipe;
 
     private SourceDataLine line;
 
     private Thread playerThread;
 
-    private AudioInputStream radioStream;
+    private InputStream radioStream;
+
+    private int[] thresholds = new int[2];
 
     public Player(PlayerPrefs prefs) throws IOException, LineUnavailableException {
-        this.pipe = new MutingPipe(Rate.RATE_48, prefs.getOpeningThreshold(), prefs.getClosingThreshold());
+        thresholds[0] = prefs.getOpeningThreshold();
+        thresholds[1] = prefs.getClosingThreshold();
     }
 
     public void setThreshold(int jingleIndex, int newLevel) {
-        pipe.setThreshold(jingleIndex, newLevel);
+        thresholds[jingleIndex] = newLevel;
+        if (pipe != null) {
+            pipe.setThreshold(jingleIndex, newLevel);
+        }
     }
 
-    public synchronized void start() {
+    public synchronized void start(Runnable errorCallback) {
         if (playerThread != null && playerThread.isAlive()) {
+            errorCallback.run();
             return;
         }
         playerThread = new Thread(() -> {
             try {
-                doStart();
+                RadioStreamProvider.RadioStream rs = RadioStreamProvider.getStream();
+                if (rs == null) {
+                    errorCallback.run();
+                    return;
+                }
+                doStart(rs);
             } catch (Exception e) {
                 LOG.error("Can't start player", e);
             }
@@ -52,9 +68,15 @@ public class Player {
 
     public synchronized void stop() {
         if (playerThread != null && playerThread.isAlive()) {
-            line.stop();
+            if (line != null) {
+                line.stop();
+                line = null;
+            }
             try {
-                radioStream.close();
+                if (radioStream != null) {
+                    radioStream.close();
+                    radioStream = null;
+                }
             } catch (IOException e) {
                 LOG.error("Can't close OGG input stream", e);
             }
@@ -63,17 +85,23 @@ public class Player {
     }
 
     public void addListener(JingleLocator.JingleListener listener) {
-        pipe.addListener(listener);
+        listeners.add(listener);
     }
 
-    private void doStart() throws LineUnavailableException, IOException, UnsupportedAudioFileException {
-        radioStream = RadioStreamProvider.getStream();
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, radioStream.getFormat());
+    private void doStart(RadioStreamProvider.RadioStream rs) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+        radioStream = rs.getStream();
+        if (radioStream == null) {
+            return;
+        }
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, rs.getFormat());
         line = (SourceDataLine) AudioSystem.getLine(info);
-        line.open(radioStream.getFormat());
+        line.open(rs.getFormat());
         line.start();
 
         OutputStream os = new AudioOutputStream(line);
+
+        pipe = new MutingPipe(Rate.getFromFormat(rs.getFormat()), thresholds[0], thresholds[1]);
+        listeners.forEach(pipe::addListener);
         pipe.copyStream(radioStream, os);
     }
 

@@ -1,4 +1,4 @@
-package eu.rekawek.radioblock;
+package eu.rekawek.radioblock.standalone;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.rekawek.radioblock.JingleLocator;
+import eu.rekawek.radioblock.Rate;
 import org.apache.commons.io.input.TeeInputStream;
 
 import eu.rekawek.radioblock.JingleLocator.JingleListener;
@@ -20,9 +22,9 @@ public class MutingPipe {
 
     private final List<JingleListener> listeners;
 
-    public MutingPipe(Rate rate) throws IOException {
+    public MutingPipe(Rate rate, int openingThreshold, int closingThreshold) throws IOException {
         List<InputStream> jingles = asList(rate.getSamples()).stream().map(MutingPipe.class.getClassLoader()::getResourceAsStream).collect(toList());
-        locator = new JingleLocator(jingles, Arrays.asList(500, 550), rate.getChannels());
+        locator = new JingleLocator(jingles, Arrays.asList(openingThreshold, closingThreshold), rate.getChannels());
         listeners = new ArrayList<>();
     }
 
@@ -42,5 +44,9 @@ public class MutingPipe {
         listeners.forEach(locator::addListener);
         TeeInputStream tis = new TeeInputStream(is, mos);
         locator.analyse(tis);
+    }
+
+    public void setThreshold(int jingleIndex, int newLevel) {
+        locator.setThreshold(jingleIndex, newLevel);
     }
 }

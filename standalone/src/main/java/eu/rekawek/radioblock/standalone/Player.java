@@ -11,7 +11,6 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.rekawek.radioblock.JingleLocator;
-import eu.rekawek.radioblock.MutingPipe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +28,12 @@ public class Player {
 
     private AudioInputStream radioStream;
 
-    public Player() throws IOException, LineUnavailableException {
-        this.pipe = new MutingPipe(Rate.RATE_48);
+    public Player(PlayerPrefs prefs) throws IOException, LineUnavailableException {
+        this.pipe = new MutingPipe(Rate.RATE_48, prefs.getOpeningThreshold(), prefs.getClosingThreshold());
+    }
+
+    public void setThreshold(int jingleIndex, int newLevel) {
+        pipe.setThreshold(jingleIndex, newLevel);
     }
 
     public synchronized void start() {
@@ -73,4 +76,5 @@ public class Player {
         OutputStream os = new AudioOutputStream(line);
         pipe.copyStream(radioStream, os);
     }
+
 }

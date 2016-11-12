@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -46,8 +47,10 @@ public class JingleLocator implements Runnable {
 
     private int jingleIndex;
 
+    private float previousResult;
+
     public JingleLocator(final List<InputStream> jingleStreams, final List<Integer> thresholds, int channels) throws IOException {
-        this.thresholds = thresholds;
+        this.thresholds = Collections.synchronizedList(new ArrayList<>(thresholds));
         this.channels = channels;
 
         List<byte[]> jingleBuffers = jingleStreams.stream().map(JingleLocator::toByteArray).collect(toList());
@@ -97,6 +100,8 @@ public class JingleLocator implements Runnable {
 
     @Override
     public void run() {
+        jingleIndex = 0;
+        previousResult = 0;
         while (running) {
             try {
                 AudioSample sample = samples.poll(10, TimeUnit.MILLISECONDS);
@@ -116,18 +121,22 @@ public class JingleLocator implements Runnable {
         windowSample.doConjAndMultiply(jingles.get(jingleIndex));
         windowSample.doIfft();
         float result = windowSample.getMaxReal(2 * windowSize + 1);
+        float sum = result + previousResult;
+        previousResult = result;
 
-        if (result > thresholds.get(jingleIndex) / 2) {
-            LOG.info("Result: {}", result);
+        if (sum > thresholds.get(jingleIndex) / 2) {
+            LOG.info("Result: {}", sum);
         } else {
-            LOG.debug("Result: {}", result);
+            LOG.debug("Result: {}", sum);
         }
 
-        if (result >= thresholds.get(jingleIndex)) {
+        listeners.forEach(l -> l.windowUpdated(jingleIndex, sum));
+        if (sum >= thresholds.get(jingleIndex)) {
             LOG.info("Found jingle: {}", jingleIndex);
-            listeners.forEach(l -> l.gotJingle(jingleIndex, result));
+            listeners.forEach(l -> l.gotJingle(jingleIndex, sum));
             jingleIndex++;
             jingleIndex = jingleIndex % jingles.size();
+            previousResult = 0;
         }
     }
 
@@ -144,9 +153,15 @@ public class JingleLocator implements Runnable {
         }
     }
 
+    public void setThreshold(int jingleIndex, int newLevel) {
+        thresholds.set(jingleIndex, newLevel);
+    }
+
     public interface JingleListener {
 
         void gotJingle(int index, float level);
 
+        default void windowUpdated(int index, float level) {
+        }
     }
 }

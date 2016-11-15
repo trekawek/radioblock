@@ -1,6 +1,6 @@
 package eu.rekawek.radioblock.standalone;
 
-import eu.rekawek.radioblock.JingleLocator;
+import eu.rekawek.analyzer.AnalysisListener;
 import eu.rekawek.radioblock.standalone.view.PlayerTrayIcon;
 import eu.rekawek.radioblock.standalone.view.PlayerWindow;
 
@@ -32,18 +32,18 @@ public class PlayerController implements PlayerWindow.PlayerWindowListener, Play
         trayIcon = new PlayerTrayIcon(prefs.isShowWindow());
         trayIcon.setListener(this);
 
-        this.player.addListener(new JingleLocator.JingleListener() {
+        this.player.addListener(new AnalysisListener() {
             @Override
-            public void gotJingle(int index, float level) {
+            public void gotJingle(String id, int index, int[] levels) {
                 trayIcon.setIcon(index == 1);
                 clear(xcorrResults[1 - index]);
                 updateStats();
             }
 
             @Override
-            public void windowUpdated(int index, float level) {
+            public void analysisInProgress(String id, int index, int[] levels) {
                 int i = xcorrResultIndex[index] % xcorrResults[index].length;
-                xcorrResults[index][i] = level;
+                xcorrResults[index][i] = levels[0];
                 xcorrResultIndex[index] = i + 1;
                 nextJingle = index;
                 updateStats();

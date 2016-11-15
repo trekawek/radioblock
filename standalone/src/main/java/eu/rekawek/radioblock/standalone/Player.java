@@ -12,17 +12,15 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-import eu.rekawek.radioblock.JingleLocator;
+import eu.rekawek.analyzer.AnalysisListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.rekawek.radioblock.Rate;
 
 public class Player {
 
     private static final Logger LOG = LoggerFactory.getLogger(Player.class);
 
-    private final List<JingleLocator.JingleListener> listeners = new ArrayList<>();
+    private final List<AnalysisListener> listeners = new ArrayList<>();
 
     private MutingPipe pipe;
 
@@ -84,7 +82,7 @@ public class Player {
         }
     }
 
-    public void addListener(JingleLocator.JingleListener listener) {
+    public void addListener(AnalysisListener listener) {
         listeners.add(listener);
     }
 
@@ -100,7 +98,7 @@ public class Player {
 
         OutputStream os = new AudioOutputStream(line);
 
-        pipe = new MutingPipe(Rate.getFromFormat(rs.getFormat()), thresholds[0], thresholds[1]);
+        pipe = new MutingPipe(rs.getFormat(), thresholds[0], thresholds[1]);
         listeners.forEach(pipe::addListener);
         pipe.copyStream(radioStream, os);
     }

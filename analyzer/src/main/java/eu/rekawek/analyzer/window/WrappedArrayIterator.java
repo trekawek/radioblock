@@ -1,4 +1,4 @@
-package eu.rekawek.radioblock;
+package eu.rekawek.analyzer.window;
 
 import java.util.Iterator;
 

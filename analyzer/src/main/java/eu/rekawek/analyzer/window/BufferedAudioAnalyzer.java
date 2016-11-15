@@ -1,4 +1,4 @@
-package eu.rekawek.radioblock;
+package eu.rekawek.analyzer.window;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class BufferedAudioAnalyzer implements Runnable {
     public BufferedAudioAnalyzer(int channels, InputStream input, Listener listener, int bufferSize, int windowSize) {
         this.input = input;
         this.listener = listener;
-        this.buffer = new short[bufferSize];
+        this.buffer = new short[bufferSize * channels];
         this.windowSize = windowSize;
         this.windowIndex = windowSize - bufferSize;
         this.channels = channels;
@@ -51,9 +51,11 @@ public class BufferedAudioAnalyzer implements Runnable {
                 buf.clear();
                 buf.put(rawBuffer, i, buf.capacity());
                 buf.rewind();
-                short val = buf.getShort(); // drop the right channel for stereo
-                buffer[index++] = val;
-                index = index % buffer.length;
+
+                while (buf.hasRemaining()) {
+                    buffer[index++] = buf.getShort();
+                    index = index % buffer.length;
+                }
 
                 if (++windowIndex == windowSize) {
                     broadcast();
@@ -64,7 +66,7 @@ public class BufferedAudioAnalyzer implements Runnable {
     }
 
     private void broadcast() {
-        listener.windowFull(() -> new WrappedArrayIterator(buffer, index));
+        listener.windowFull(new WrappedArrayIterator(buffer, index));
     }
 
     @Override
@@ -77,6 +79,6 @@ public class BufferedAudioAnalyzer implements Runnable {
     }
 
     public interface Listener {
-        void windowFull(Iterable<Short> window);
+        void windowFull(Iterator<Short> window);
     }
 }

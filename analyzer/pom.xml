@@ -32,7 +32,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>eu.rekawek.radioblock.Main</mainClass>
+              <mainClass>eu.rekawek.analyzer.cli.Main</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
@@ -63,6 +63,11 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>20.0</version>
     </dependency>
 
     <dependency>

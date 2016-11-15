@@ -2,7 +2,6 @@ package eu.rekawek.radioblock.standalone;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.prefs.Preferences;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;

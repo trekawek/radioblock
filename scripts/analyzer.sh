@@ -1,9 +1,13 @@
 #!/bin/bash
 
 MUTE=10
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-rtl_fm -M wbfm -f 89.5M -g 0 \
- | /opt/jdk8/bin/java -jar analyzer-1.0.0-SNAPSHOT.jar RATE_32_MONO 80 90 \
+
+rtl_fm -M wbfm -f 89.50M -g 0 \
+ | /opt/jdk8/bin/java -jar analyzer-1.0.0-SNAPSHOT.jar 1 \
+   $DIR/commercial-start-32k-mono.raw 80 \
+   $DIR/commercial-end-32k-mono.raw 90 \
  | while read line
 do
   if [ "$line" == "Got jingle 0" ]; then

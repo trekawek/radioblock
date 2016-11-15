@@ -19,8 +19,13 @@ get_volume() {
 }
 
 is_radio() {
-  local xml=$(post '<?xml version="1.0" encoding="utf-8"?><YAMAHA_AV cmd="GET"><Tuner><Play_Info>GetParam</Play_Info></Tuner></YAMAHA_AV>')
-  [[ "$xml" == *"8950"* ]] && ! [[ "$xml" == *"<Program_Service></Program_Service>"* ]] && echo "1" || echo "0"
+  local basic_status=$(post '<?xml version="1.0" encoding="utf-8"?><YAMAHA_AV cmd="GET"><Main_Zone><Basic_Status>GetParam</Basic_Status></Main_Zone></YAMAHA_AV>')
+  [[ "$basic_status" == *"<Power>On</Power>"* ]] || return 0
+  [[ "$basic_status" == *"<Input_Sel>TUNER</Input_Sel>"* ]] || return 0
+
+  local tuner_status=$(post '<?xml version="1.0" encoding="utf-8"?><YAMAHA_AV cmd="GET"><Tuner><Play_Info>GetParam</Play_Info></Tuner></YAMAHA_AV>')
+  [[ "$tuner_status" == *"8950"* ]] || return 0
+  return 1
 }
 
 case "$1" in
@@ -33,6 +38,7 @@ volume)
 ;;
 is_radio)
   is_radio
+  echo $?
 ;;
 esac
 

@@ -4,9 +4,6 @@ import eu.rekawek.analyzer.sample.Waveform;
 import eu.rekawek.analyzer.sample.WaveformVector;
 
 import java.util.Iterator;
-import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toList;
 
 public enum MultiplexingStrategy {
     LEFT {
@@ -27,10 +24,7 @@ public enum MultiplexingStrategy {
     }, SEPARATE {
         @Override
         public WaveformVector getWaveformVector(Iterator<Short> buffer, int channels, int size) {
-            return new WaveformVector(IntStream.of(channels)
-                    .mapToObj(c -> Waveform.createFromSignedShort(new ChannelIterator(buffer, channels, c), size))
-                    .collect(toList())
-                    .toArray(new Waveform[channels]));
+            return new WaveformVector(Waveform.createFromSignedShort(buffer, channels, size));
         }
     };
 

@@ -12,19 +12,32 @@ public class Waveform {
 
     private final int length;
 
-    public Waveform(Iterator<Float> waveform, int length) {
-        this.buffer = new float[length * 2];
+    private Waveform(float[] buffer, int length) {
+        this.buffer = buffer;
         this.length = length;
-
-        int i = 0;
-        while (waveform.hasNext()) {
-            buffer[i++] = waveform.next();
-        }
     }
 
     public static Waveform createFromSignedShort(Iterator<Short> waveform, int length) {
-        return new Waveform(transform(waveform, s -> s / 32768f), length);
+        return createFromSignedShort(waveform, 1, length)[0];
     }
+
+    public static Waveform[] createFromSignedShort(Iterator<Short> waveform, int channels, int length) {
+        Iterator<Float> floatIt = transform(waveform, s -> s / 32768f);
+        float[][] buffers = new float[channels][length * 2];
+        int i = 0;
+        while (floatIt.hasNext()) {
+            for (int c = 0; c < channels; c++) {
+                buffers[c][i] = floatIt.next();
+            }
+            i++;
+        }
+        Waveform[] waveforms = new Waveform[channels];
+        for (int c = 0; c < channels; c++) {
+            waveforms[c] = new Waveform(buffers[c], length);
+        }
+        return waveforms;
+    }
+
 
     public Waveform doFft() {
         FloatFFT_1D fft = new FloatFFT_1D(length);

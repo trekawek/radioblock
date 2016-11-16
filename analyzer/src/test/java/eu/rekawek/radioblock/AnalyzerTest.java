@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import eu.rekawek.analyzer.AnalysisListener;
 import eu.rekawek.analyzer.Analyzer;
 import eu.rekawek.analyzer.AnalyzerBuilder;
 import eu.rekawek.analyzer.channel.MultiplexingStrategy;
@@ -47,17 +46,8 @@ public class AnalyzerTest {
         builder.addJingle("1", getFile("commercial-end"), 200);
         Analyzer analyzer = builder.build();
 
-        final List<String> foundJingles = new ArrayList<String>();
-        analyzer.addListener(new AnalysisListener() {
-            @Override
-            public void analysisInProgress(String expectedId, int expectedJingleIndex, int[] levels) {
-            }
-
-            @Override
-            public void gotJingle(String id, int jingleIndex, int[] levels) {
-                foundJingles.add(id);
-            }
-        });
+        final List<String> foundJingles = new ArrayList<>();
+        analyzer.addListener((id, jingleIndex, levels) -> foundJingles.add(id));
         analyzer.analyze(getFile("commercial-block"));
         assertEquals(Arrays.asList("0", "1"), foundJingles);
     }

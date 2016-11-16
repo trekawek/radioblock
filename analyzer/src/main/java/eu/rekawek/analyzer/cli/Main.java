@@ -1,6 +1,5 @@
 package eu.rekawek.analyzer.cli;
 
-import eu.rekawek.analyzer.AnalysisListener;
 import eu.rekawek.analyzer.Analyzer;
 import eu.rekawek.analyzer.AnalyzerBuilder;
 import eu.rekawek.analyzer.channel.MultiplexingStrategy;
@@ -29,16 +28,7 @@ public class Main {
         }
         Analyzer analyzer = builder.build();
 
-        analyzer.addListener(new AnalysisListener() {
-            @Override
-            public void analysisInProgress(String expectedId, int expectedJingleIndex, int[] levels) {
-            }
-
-            @Override
-            public void gotJingle(String id, int jingleIndex, int[] levels) {
-                System.out.println("Got jingle " + jingleIndex);
-            }
-        });
+        analyzer.addListener((id, jingleIndex, levels) -> System.out.println("Got jingle " + jingleIndex));
         analyzer.analyze(new FuseInputStream(System.in, 1000, () -> System.exit(0)));
     }
 

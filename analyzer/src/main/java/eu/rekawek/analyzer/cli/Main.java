@@ -11,7 +11,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String... args) throws IOException {
-        if (args.length < 3 || args.length % 2 == 1) {
+        if (args.length < 3) {
             showUsage();
             return;
         }

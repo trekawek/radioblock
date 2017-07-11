@@ -17,15 +17,12 @@ AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojk
 * RATE_44_1,
 * RATE_48.
 
-### Case 2 - muting ads
-
-    ffmpeg -loglevel -8 \
-           -i http://stream3.polskieradio.pl:8904/\;stream \
-           -f s16le -acodec pcm_s16le - \
-      | java -cp analyzer-1.0.0-SNAPSHOT.jar eu.rekawek.radioblock.MuteableMain RATE_44_1 \
-      | play -r 44100 -b 16 -c 2 -e signed -t raw -
-
-
-### Case 3 - gui
+### Case 2 - GUI
 
     java -jar standalone-1.0.0-SNAPSHOT.jar
+
+### Case 3 - write the muted stream to stdout
+
+    java -cp standalone-1.0.0-SNAPSHOT.jar eu.rekawek.radioblock.standalone.HeadlessMain
+    
+Output format is PCM, 48000, stereo, low-endian.

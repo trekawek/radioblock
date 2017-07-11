@@ -10,6 +10,10 @@ public class PlayerPrefs {
 
     private static final String CLOSING_THRESHOLD_PROP = "closingThreshold";
 
+    static final int OPENING_THRESHOLD_DEFAULT = 500;
+
+    static final int CLOSING_THRESHOLD_DEFAULT = 700;
+
     private final Preferences prefs;
 
     public PlayerPrefs() {
@@ -33,10 +37,10 @@ public class PlayerPrefs {
     }
 
     public int getOpeningThreshold() {
-        return prefs.getInt(OPENING_THRESHOLD_PROP, 500);
+        return prefs.getInt(OPENING_THRESHOLD_PROP, OPENING_THRESHOLD_DEFAULT);
     }
 
     public int getClosingThreshold() {
-        return prefs.getInt(CLOSING_THRESHOLD_PROP, 550);
+        return prefs.getInt(CLOSING_THRESHOLD_PROP, CLOSING_THRESHOLD_DEFAULT);
     }
 }

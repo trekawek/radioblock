@@ -77,11 +77,22 @@
     </dependency>
 
     <dependency>
+      <groupId>com.github.axet</groupId>
+      <artifactId>jssrc</artifactId>
+      <version>1.0.2-1</version>
+    </dependency>
+
+    <dependency>
       <groupId>com.intellij</groupId>
       <artifactId>forms_rt</artifactId>
       <version>7.0.3</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.6</version>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>

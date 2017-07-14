@@ -23,6 +23,6 @@ AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojk
 
 ### Case 3 - write the muted stream to stdout
 
-    java -cp standalone-1.0.0-SNAPSHOT.jar eu.rekawek.radioblock.standalone.HeadlessMain
+    java -jar standalone-1.0.0-SNAPSHOT.jar --cli [OPENING_THRESHOLD [CLOSING_THRESHOLD]]
     
 Output format is PCM, 48000, stereo, low-endian.

@@ -23,7 +23,7 @@ public class RadioStreamProvider {
 
     public static RadioStream getStream() {
         try {
-            return getVorbis("http://w.dktr.pl:8000/trojka3.ogg");
+            return getVorbis("http://41.dktr.pl:8000/trojka.ogg");
         } catch (IOException | UnsupportedAudioFileException e) {
             LOG.error("Can't get the w.dktr.pl stream", e);
         }

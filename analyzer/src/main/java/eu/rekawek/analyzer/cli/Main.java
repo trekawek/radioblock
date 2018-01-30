@@ -7,6 +7,7 @@ import eu.rekawek.analyzer.channel.MultiplexingStrategy;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
@@ -29,7 +30,7 @@ public class Main {
         Analyzer analyzer = builder.build();
 
         analyzer.addListener((id, jingleIndex, levels) -> System.out.println("Got jingle " + jingleIndex));
-        analyzer.analyze(new FuseInputStream(System.in, 1000, () -> System.exit(0)));
+        analyzer.analyze(new FuseInputStream(System.in, TimeUnit.MINUTES.toMillis(1), () -> System.exit(0)));
     }
 
     private static int safeParseInt(String s) {

@@ -6,23 +6,32 @@ AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojk
 
 ### Case 1 - detecting ads
 
-    ffmpeg -loglevel -8 \
-           -i http://stream3.polskieradio.pl:8904/\;stream \
-           -f s16le -acodec pcm_s16le - \
-      | java -jar analyzer-1.0.0-SNAPSHOT.jar RATE_44_1 500 800
+The analyzer modules is a CLI application reading the stream from the standard input and trying to find the configured samples. For instance, the command below uses ffmpeg to generate the raw stream of Polish "Trójka" and looks for the commercial start and stop jingles, with thresholds 500 and 700, respectively. The "2" describes the channel count:
 
-500 and 800 are the thresholds for detecting ad start/stop jingle. Possible rate values:
-
-* RATE_32_MONO,
-* RATE_44_1,
-* RATE_48.
+```bash
+cd analyzer
+ffmpeg -loglevel -8 \
+       -i http://stream3.polskieradio.pl:8904/\;stream \
+       -f s16le -acodec pcm_s16le - \
+  | java -jar target/analyzer-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
+    2 \
+    src/test/resources/commercial-start-44.1k.raw 500 \
+    src/test/resources/commercial-end-44.1k.raw 700
+```
 
 ### Case 2 - GUI
 
-    java -jar standalone-1.0.0-SNAPSHOT.jar
+A standalone "Trójka" player with GUI:
+
+```bash
+java -jar standalone/target/standalone-1.0.0-SNAPSHOT.jar
+```
 
 ### Case 3 - write the muted stream to stdout
 
-    java -jar standalone-1.0.0-SNAPSHOT.jar --cli [OPENING_THRESHOLD [CLOSING_THRESHOLD]]
-    
-Output format is PCM, 48000, stereo, low-endian.
+A command line "Trójka" player, passing the stream to stdout. Output format is PCM, 48000, stereo, low-endian. Example:
+
+```bash
+java -jar standalone/target/standalone-1.0.0-SNAPSHOT.jar --cli 500 700 \
+  | play -t raw -b 16 -c 2 -r 48000 -e signed-integer -
+```

@@ -23,7 +23,7 @@ Another example - reading the audio stream from the RTL-SDR device:
 
 ```bash
 rtl_fm -M wbfm -f 89.50M -g 0 \
- | java -jar analyzer-*.jar 1 \
+ | java -jar analyzer-1.0.0-SNAPSHOT-jar-with-dependencies.jar 1 \
    commercial-start-32k-mono.raw 180 \
    commercial-end-32k-mono.raw 190 \
 ```

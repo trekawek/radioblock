@@ -6,6 +6,8 @@ RADIO_TTL=0
 cd /usr/local/bin/radioblock
 
 start_analyzer() {
+  echo 1 > /sys/bus/usb/devices/1-1.3/authorized
+  sleep 2
   ./analyzer.sh &
   ANALYZER_PID="$!"
   echo "$(date) started analyzer with pid $ANALYZER_PID"
@@ -13,9 +15,13 @@ start_analyzer() {
 
 stop_analyzer() {
   pkill -f 'analyzer-1.0.0-SNAPSHOT.jar'
+  sleep 2
+  echo 0 > /sys/bus/usb/devices/1-1.3/authorized
   echo "$(date) stopped analyzer with pid $ANALYZER_PID"
   ANALYZER_PID="0"
 }
+
+echo 0 > /sys/bus/usb/devices/1-1.3/authorized
 
 while :
 do

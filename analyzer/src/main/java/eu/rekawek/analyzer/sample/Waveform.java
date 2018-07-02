@@ -23,14 +23,7 @@ public class Waveform {
 
     public static Waveform[] createFromSignedShort(Iterator<Short> waveform, int channels, int length) {
         Iterator<Float> floatIt = transform(waveform, s -> s / 32768f);
-        float[][] buffers = new float[channels][length * 2];
-        int i = 0;
-        while (floatIt.hasNext()) {
-            for (int c = 0; c < channels; c++) {
-                buffers[c][i] = floatIt.next();
-            }
-            i++;
-        }
+        float[][] buffers = demultiplex(floatIt, channels, length);
         Waveform[] waveforms = new Waveform[channels];
         for (int c = 0; c < channels; c++) {
             waveforms[c] = new Waveform(buffers[c], length);
@@ -38,6 +31,19 @@ public class Waveform {
         return waveforms;
     }
 
+    public static float[][] demultiplex(Iterator<Float> floatIt, int channels, int length) {
+        float[][] buffers = new float[channels][length * 2];
+        int i = 0;
+        int c = 0;
+        while (floatIt.hasNext()) {
+            buffers[c++][i] = floatIt.next();
+            if (c == channels) {
+                c = 0;
+                i++;
+            }
+        }
+        return buffers;
+    }
 
     public Waveform doFft() {
         FloatFFT_1D fft = new FloatFFT_1D(length);

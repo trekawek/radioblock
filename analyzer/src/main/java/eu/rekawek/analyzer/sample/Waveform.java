@@ -25,10 +25,9 @@ public class Waveform {
         Iterator<Float> floatIt = transform(waveform, s -> s / 32768f);
         float[][] buffers = new float[channels][length * 2];
         int i = 0;
-        while (floatIt.hasNext()) {
-            for (int c = 0; c < channels; c++) {
-                buffers[c][i] = floatIt.next();
-            }
+
+        for (int c = 0; c < channels && floatIt.hasNext(); c++) {
+            buffers[c][i] = floatIt.next();
             i++;
         }
         Waveform[] waveforms = new Waveform[channels];

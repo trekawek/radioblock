@@ -1,9 +1,11 @@
 package eu.rekawek.analyzer.channel;
 
+import com.google.common.collect.AbstractIterator;
+
 import java.util.Iterator;
 import java.util.stream.IntStream;
 
-public class CombinedChannelIterator implements Iterator<Short> {
+public class CombinedChannelIterator extends AbstractIterator<Short> {
 
     private final Iterator<Short> it;
 
@@ -15,14 +17,13 @@ public class CombinedChannelIterator implements Iterator<Short> {
     }
 
     @Override
-    public boolean hasNext() {
-        return it.hasNext();
-    }
-
-    @Override
-    public Short next() {
+    protected Short computeNext() {
         for (int i = 0; i < localBuffer.length; i++) {
-            localBuffer[i] = it.next();
+            if (it.hasNext()) {
+                localBuffer[i] = it.next();
+            } else {
+                return endOfData();
+            }
         }
         return (short) IntStream.of(localBuffer).average().orElse(0);
     }

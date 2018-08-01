@@ -32,7 +32,7 @@ public class Player {
 
     private int[] thresholds = new int[2];
 
-    public Player(PlayerPrefs prefs) throws IOException, LineUnavailableException {
+    public Player(PlayerPrefs prefs) {
         thresholds[0] = prefs.getOpeningThreshold();
         thresholds[1] = prefs.getClosingThreshold();
     }
@@ -51,12 +51,14 @@ public class Player {
         }
         playerThread = new Thread(() -> {
             try {
-                RadioStreamProvider.RadioStream rs = RadioStreamProvider.getStream();
-                if (rs == null) {
-                    errorCallback.run();
-                    return;
+                while (true) {
+                    RadioStreamProvider.RadioStream rs = RadioStreamProvider.getStream();
+                    if (rs == null) {
+                        errorCallback.run();
+                        return;
+                    }
+                    doStart(rs);
                 }
-                doStart(rs);
             } catch (Exception e) {
                 LOG.error("Can't start player", e);
             }
@@ -86,7 +88,7 @@ public class Player {
         listeners.add(listener);
     }
 
-    private void doStart(RadioStreamProvider.RadioStream rs) throws LineUnavailableException, IOException, UnsupportedAudioFileException {
+    private void doStart(RadioStreamProvider.RadioStream rs) throws LineUnavailableException, IOException {
         radioStream = rs.getStream();
         if (radioStream == null) {
             return;
@@ -96,11 +98,17 @@ public class Player {
         line.open(rs.getFormat());
         line.start();
 
-        OutputStream os = new AudioOutputStream(line);
+        try {
+            OutputStream os = new AudioOutputStream(line);
 
-        pipe = new MutingPipe(rs.getFormat(), thresholds[0], thresholds[1]);
-        listeners.forEach(pipe::addListener);
-        pipe.copyStream(radioStream, os);
+            pipe = new MutingPipe(rs.getFormat(), thresholds[0], thresholds[1]);
+            listeners.forEach(pipe::addListener);
+            pipe.copyStream(radioStream, os);
+        } finally {
+            line.stop();
+            line.close();
+            radioStream.close();
+        }
     }
 
 }

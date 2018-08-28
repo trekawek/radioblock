@@ -4,13 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.rekawek.radioblock</groupId>
   <artifactId>analyzer</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>eu.rekawek.radioblock</groupId>
     <artifactId>radioblock-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.3.2-SNAPSHOT</version>
   </parent>
 
   <properties>

@@ -13,7 +13,7 @@ cd analyzer
 ffmpeg -loglevel -8 \
        -i http://stream3.polskieradio.pl:8904/\;stream \
        -f s16le -acodec pcm_s16le - \
-  | java -jar target/analyzer-1.0.0-SNAPSHOT-jar-with-dependencies.jar \
+  | java -jar target/analyzer-*-jar-with-dependencies.jar \
     2 \
     src/test/resources/commercial-start-44.1k.raw 500 \
     src/test/resources/commercial-end-44.1k.raw 700
@@ -23,7 +23,7 @@ Another example - reading the audio stream from the RTL-SDR device:
 
 ```bash
 rtl_fm -M wbfm -f 89.50M -g 0 \
- | java -jar analyzer-1.0.0-SNAPSHOT-jar-with-dependencies.jar 1 \
+ | java -jar analyzer-*-jar-with-dependencies.jar 1 \
    commercial-start-32k-mono.raw 180 \
    commercial-end-32k-mono.raw 190 \
 ```
@@ -33,7 +33,7 @@ rtl_fm -M wbfm -f 89.50M -g 0 \
 A standalone "Trójka" player with GUI:
 
 ```bash
-java -jar standalone/target/standalone-1.0.0-SNAPSHOT.jar
+java -jar standalone/target/standalone-*.jar
 ```
 
 ### Case 3 - write the muted stream to stdout
@@ -41,6 +41,6 @@ java -jar standalone/target/standalone-1.0.0-SNAPSHOT.jar
 A command line "Trójka" player, passing the stream to stdout. Output format is PCM, 48000, stereo, low-endian. Example:
 
 ```bash
-java -jar standalone/target/standalone-1.0.0-SNAPSHOT.jar --cli 500 700 \
+java -jar standalone/target/standalone-*.jar --cli 500 700 \
   | play -t raw -b 16 -c 2 -r 48000 -e signed-integer -
 ```

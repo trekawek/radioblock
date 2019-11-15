@@ -14,6 +14,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 
 import static javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED;
 
@@ -21,16 +22,31 @@ public class RadioStreamProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadioStreamProvider.class);
 
+    private static final String[] VORBIS_URL = new String[] {
+            "http://41.dktr.pl:8000/trojka.ogg",
+            "http://z.dktr.pl:8000/trojka.ogg",
+            "http://d.dktr.pl:8000/trojka.ogg",
+            "http://org.dktr.pl:8000/trojka3.ogg",
+    };
+
+    private static final String[] ICECAST_URLS = new String[] {
+            "http://stream3.polskieradio.pl:8904/;stream"
+    };
+
     public static RadioStream getStream() {
-        try {
-            return getVorbis("http://41.dktr.pl:8000/trojka.ogg");
-        } catch (IOException | UnsupportedAudioFileException e) {
-            LOG.error("Can't get the w.dktr.pl stream", e);
+        for (String url : VORBIS_URL) {
+            try {
+                return getVorbis(url);
+            } catch (IOException | UnsupportedAudioFileException e) {
+                LOG.error("Can't get stream {}", url, e);
+            }
         }
-        try {
-            return getIcecast("http://stream3.polskieradio.pl:8904/;stream", 96000);
-        } catch (IOException e) {
-            LOG.error("Can't get the official stream", e);
+        for (String url : ICECAST_URLS) {
+            try {
+                return getIcecast(url, 96000);
+            } catch (IOException e) {
+                LOG.error("Can't get stream {}", url, e);
+            }
         }
         return null;
     }

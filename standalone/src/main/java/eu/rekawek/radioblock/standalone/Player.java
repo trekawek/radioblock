@@ -13,6 +13,7 @@ import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.rekawek.analyzer.AnalysisListener;
+import eu.rekawek.radioblock.standalone.stream.RadioStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public class Player {
         playerThread = new Thread(() -> {
             try {
                 while (true) {
-                    RadioStreamProvider.RadioStream rs = RadioStreamProvider.getStream();
+                    RadioStream rs = RadioStreamProvider.getStream();
                     if (rs == null) {
                         errorCallback.run();
                         return;
@@ -88,20 +89,19 @@ public class Player {
         listeners.add(listener);
     }
 
-    private void doStart(RadioStreamProvider.RadioStream rs) throws LineUnavailableException, IOException {
-        radioStream = rs.getStream();
+    private void doStart(RadioStream radioStream) throws LineUnavailableException, IOException {
         if (radioStream == null) {
             return;
         }
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, rs.getFormat());
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, radioStream.getAudioFormat());
         line = (SourceDataLine) AudioSystem.getLine(info);
-        line.open(rs.getFormat());
+        line.open(radioStream.getAudioFormat());
         line.start();
 
         try {
             OutputStream os = new AudioOutputStream(line);
 
-            pipe = new MutingPipe(rs.getFormat(), thresholds[0], thresholds[1]);
+            pipe = new MutingPipe(radioStream.getAudioFormat(), thresholds[0], thresholds[1]);
             listeners.forEach(pipe::addListener);
             pipe.copyStream(radioStream, os);
         } finally {

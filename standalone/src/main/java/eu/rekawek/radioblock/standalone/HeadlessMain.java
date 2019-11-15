@@ -2,6 +2,7 @@ package eu.rekawek.radioblock.standalone;
 
 import com.jssrc.resample.JSSRCResampler;
 import eu.rekawek.analyzer.AnalysisListener;
+import eu.rekawek.radioblock.standalone.stream.RadioStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,17 +29,17 @@ public class HeadlessMain {
             closingThreshold = Integer.parseInt(args[1]);
         }
 
-        RadioStreamProvider.RadioStream broadcast = RadioStreamProvider.getStream();
+        RadioStream broadcast = RadioStreamProvider.getStream();
 
         AudioFormat format;
         InputStream stream;
 
-        if (broadcast.getFormat().matches(FORMAT)) {
-            format = broadcast.getFormat();
-            stream = broadcast.getStream();
+        if (broadcast.getAudioFormat().matches(FORMAT)) {
+            format = broadcast.getAudioFormat();
+            stream = broadcast;
         } else {
             format = FORMAT;
-            stream = new JSSRCResampler(broadcast.getFormat(), FORMAT, broadcast.getStream());
+            stream = new JSSRCResampler(broadcast.getAudioFormat(), FORMAT, broadcast);
         }
 
         MutingPipe pipe = new MutingPipe(format, openingThreshold, closingThreshold);

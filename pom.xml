@@ -32,6 +32,22 @@
           <target>11</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <releaseProfiles>github</releaseProfiles>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
+
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub trekawek Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/trekawek/radioblock</url>
+    </repository>
+  </distributionManagement>
 </project>

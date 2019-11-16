@@ -1,6 +1,7 @@
 package eu.rekawek.radioblock.standalone.stream;
 
 import javazoom.spi.vorbis.sampled.file.VorbisAudioFileReader;
+import org.apache.commons.io.IOUtils;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -32,7 +33,12 @@ public class VorbisInputStream extends RadioStream {
                 baseFormat.getChannels() * 2,
                 baseFormat.getSampleRate(),
                 false);
-        delegate = AudioSystem.getAudioInputStream(targetFormat, aisOgg);
+        try {
+            delegate = AudioSystem.getAudioInputStream(targetFormat, aisOgg);
+        } catch (IllegalArgumentException e) {
+            IOUtils.closeQuietly(aisOgg);
+            throw new IOException(e);
+        }
     }
 
     @Override

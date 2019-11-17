@@ -8,7 +8,7 @@
   <parent>
     <groupId>eu.rekawek.radioblock</groupId>
     <artifactId>radioblock-parent</artifactId>
-    <version>1.3.7-SNAPSHOT</version>
+    <version>1.3.7</version>
   </parent>
 
   <properties>

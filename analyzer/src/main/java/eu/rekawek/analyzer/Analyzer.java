@@ -43,6 +43,8 @@ public class Analyzer {
 
     private final int next2Pow;
 
+    private int jingleIndex;
+
     Analyzer(AnalyzerBuilder analyzerBuilder) {
         this.channels = analyzerBuilder.getChannels();
         this.multiplexingStrategy = analyzerBuilder.getMultiplexingStrategy();
@@ -106,13 +108,19 @@ public class Analyzer {
         return (long) pow(2, exp);
     }
 
+    public synchronized void setNextJingleIndex(int index) {
+        this.jingleIndex = index;
+    }
+
+    private synchronized int getNextJingleIndex() {
+        return jingleIndex;
+    }
+
     private class AnalyzerRunnable implements Runnable {
 
         private final BlockingQueue<WaveformVector> samples = new ArrayBlockingQueue<WaveformVector>(2);
 
         private AtomicBoolean doStop = new AtomicBoolean();
-
-        private int jingleIndex;
 
         private int[] previousResult;
 
@@ -124,7 +132,14 @@ public class Analyzer {
                     if (sample == null) {
                         continue;
                     }
-                    handleNewWindow(sample);
+
+                    int localJingleIndex = getNextJingleIndex();
+                    boolean found = handleNewWindow(sample, localJingleIndex);
+                    if (found) {
+                        localJingleIndex++;
+                        localJingleIndex %= jingleList.size();
+                        setNextJingleIndex(localJingleIndex);
+                    }
                 } catch (InterruptedException e) {
                     LOG.error("Interrupted", e);
                     break;
@@ -132,7 +147,7 @@ public class Analyzer {
             }
         }
 
-        public void handleNewWindow(WaveformVector windowSample) {
+        public boolean handleNewWindow(WaveformVector windowSample, int jingleIndex) {
             windowSample.doFft();
             windowSample.doConjAndMultiply(waveformVectors.get(jingleIndex));
             windowSample.doIfft();
@@ -158,9 +173,10 @@ public class Analyzer {
             if (level >= threshold) {
                 LOG.info("Found jingle: {}", id);
                 listeners.forEach(l -> l.gotJingle(id, jingleIndex, sum));
-                jingleIndex++;
-                jingleIndex = jingleIndex % jingleList.size();
                 previousResult = null;
+                return true;
+            } else {
+                return false;
             }
         }
 

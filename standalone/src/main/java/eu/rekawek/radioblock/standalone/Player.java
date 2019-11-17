@@ -105,6 +105,7 @@ public class Player {
             listeners.forEach(pipe::addListener);
             pipe.copyStream(radioStream, os);
         } finally {
+            pipe.close();
             line.stop();
             line.close();
             radioStream.close();

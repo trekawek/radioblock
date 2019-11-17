@@ -1,0 +1,31 @@
+version: '3.7'
+
+x-common-variables: &common-variables
+  source_password: "shoh5eghoohee9Ai"
+
+services:
+  icecast:
+    build:
+      context: .
+      dockerfile: Dockerfile.icecast
+    environment:
+      <<: *common-variables
+      relay_password: "Aish2RohC5AicieY"
+      admin_password: "leengiex0eeGhieh"
+
+  ices:
+    build:
+      context: .
+      dockerfile: Dockerfile.ices
+    links:
+      - icecast
+    environment: *common-variables
+
+  nginx:
+    image: nginx:1.17
+    links:
+      - icecast
+    ports:
+      - "8000:80"
+    volumes:
+      - ./src/main/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf

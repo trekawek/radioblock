@@ -1,0 +1,13 @@
+FROM alpine:3.10
+
+RUN apk add --no-cache ices openjdk11 gettext
+RUN mkdir /app
+RUN mkdir /var/log/ices
+WORKDIR /app
+
+ADD src/main/docker/ices/* /app/
+ADD target/standalone-*.jar /app/standalone.jar
+
+ENV source_password hackme
+
+CMD [ "/bin/sh", "start.sh" ]

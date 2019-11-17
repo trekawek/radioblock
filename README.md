@@ -4,6 +4,14 @@ AdBlock for the polish public radio [Trójka](http://www.polskieradio.pl/9,Trojk
 
 ## Usage
 
+### Building
+
+The project can be build with:
+
+```bash
+mvn clean install
+```
+
 ### Case 1 - detecting ads
 
 The analyzer modules is a CLI application reading the stream from the standard input and trying to find the configured samples. For instance, the command below uses ffmpeg to generate the raw stream of Polish "Trójka" and looks for the commercial start and stop jingles, with thresholds 500 and 700, respectively. The "2" describes the channel count:
@@ -44,3 +52,14 @@ A command line "Trójka" player, passing the stream to stdout. Output format is 
 java -jar standalone/target/standalone-*.jar --cli 500 700 \
   | play -t raw -b 16 -c 2 -r 48000 -e signed-integer -
 ```
+
+### Case 4 - Icecast with Docker
+
+An Icecast server streaming the radio broadcast, with ads muted.
+
+```bash
+cd standalone
+docker-compose up --build 
+```
+
+The broadcast will be available at http://localhost:8000/

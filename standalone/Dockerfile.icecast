@@ -1,0 +1,15 @@
+FROM alpine:3.10
+
+RUN apk add --no-cache icecast gettext
+RUN mkdir /app
+WORKDIR /app
+
+ADD src/main/docker/icecast/* /app/
+
+ENV source_password hackme
+ENV relay_password hackme
+ENV admin_password hackme
+
+EXPOSE 8000
+
+CMD [ "/bin/sh", "start.sh" ]

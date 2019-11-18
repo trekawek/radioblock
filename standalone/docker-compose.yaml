@@ -12,6 +12,7 @@ services:
       <<: *common-variables
       relay_password: "Aish2RohC5AicieY"
       admin_password: "leengiex0eeGhieh"
+    restart: on-failure
 
   ices:
     build:
@@ -20,11 +21,13 @@ services:
     links:
       - icecast
     environment: *common-variables
+    restart: on-failure
 
   nginx:
     image: nginx:1.17
     links:
       - icecast
+    restart: on-failure
     ports:
       - "8000:80"
     volumes:

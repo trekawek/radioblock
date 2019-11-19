@@ -21,7 +21,7 @@ services:
     links:
       - icecast
     environment: *common-variables
-    restart: on-failure
+    restart: always
 
   nginx:
     image: nginx:1.17

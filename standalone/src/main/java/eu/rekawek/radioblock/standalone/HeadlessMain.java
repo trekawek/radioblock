@@ -51,7 +51,7 @@ public class HeadlessMain {
 
     private static class AnalyserFuse implements AnalysisListener, Runnable {
 
-        private static final long TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(10);
+        private static final long TIMEOUT_MILLIS = TimeUnit.HOURS.toMillis(12);
 
         private volatile boolean alive;
 

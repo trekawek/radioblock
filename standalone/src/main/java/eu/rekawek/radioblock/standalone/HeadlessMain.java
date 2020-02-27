@@ -10,6 +10,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -29,17 +30,20 @@ public class HeadlessMain {
             closingThreshold = Integer.parseInt(args[1]);
         }
 
-        RadioStream broadcast = RadioStreamProvider.getStream();
-
-        AudioFormat format;
         InputStream stream;
-
-        if (broadcast.getAudioFormat().matches(FORMAT)) {
-            format = broadcast.getAudioFormat();
-            stream = broadcast;
-        } else {
+        AudioFormat format;
+        if (Arrays.asList(args).contains("--stdin")) {
+            stream = System.in;
             format = FORMAT;
-            stream = new JSSRCResampler(broadcast.getAudioFormat(), FORMAT, broadcast);
+        } else {
+            RadioStream broadcast = RadioStreamProvider.getStream();
+            if (broadcast.getAudioFormat().matches(FORMAT)) {
+                format = broadcast.getAudioFormat();
+                stream = broadcast;
+            } else {
+                format = FORMAT;
+                stream = new JSSRCResampler(broadcast.getAudioFormat(), FORMAT, broadcast);
+            }
         }
 
         MutingPipe pipe = new MutingPipe(format, openingThreshold, closingThreshold);

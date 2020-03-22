@@ -24,6 +24,6 @@ vu_meter="$?"
 trap "sudo kill $vu_meter" EXIT
 
 arecord -D usb -c 1 -r 48000 -f S16_LE -t raw - \
- | java -Dfifo="${APP_HOME}/fifo/radioblock.fifo" -jar "${APP_HOME}/standalone-1.3.8-SNAPSHOT.jar" --cli $JINGLE1_LEVEL $JINGLE2_LEVEL --stdin --mono \
+ | java -Dfifo="${APP_HOME}/fifo/radioblock.fifo" -jar "${APP_HOME}"/standalone-*.jar --cli "${JINGLE1_LEVEL}" "${JINGLE2_LEVEL}" --stdin --mono \
  | sox -t raw -r 48000 -e signed -b 16 -c 1 - -t raw -r 48000 -e signed -b 16 -c 2 - \
  | aplay -c 2 -r 48000 -f S16_LE -t raw -

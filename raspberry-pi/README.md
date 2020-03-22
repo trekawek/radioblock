@@ -11,7 +11,7 @@
   - [asound.conf](asound.conf) -> `/etc/asound.conf`
   - [radioblock.service](radioblock.service) -> `/etc/systemd/system/radioblock.service`
   - [run-radioblock.sh](run-radioblock.sh) and [vu-meter-server.py](vu-meter-server.py) -> `/home/pi`
-  - `standalone-*.jar` -> `/home/pi`
+  - [../standalone](standalone-*.jar) -> `/home/pi`
 3. Start run-radioblock.sh
 4. To run it on startup:
 ```

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -18,9 +17,11 @@ public class HeadlessMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(HeadlessMain.class);
 
-    private static final AudioFormat FORMAT = new AudioFormat(48000, 16, 2, true, false);
+    private static final AudioFormat FORMAT_STEREO = new AudioFormat(48000, 16, 2, true, false);
 
-    public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
+    private static final AudioFormat FORMAT_MONO = new AudioFormat(48000, 16, 1, true, false);
+
+    public static void main(String[] args) throws IOException {
         int openingThreshold = PlayerPrefs.OPENING_THRESHOLD_DEFAULT;
         int closingThreshold = PlayerPrefs.CLOSING_THRESHOLD_DEFAULT;
         if (args.length >= 1) {
@@ -32,24 +33,56 @@ public class HeadlessMain {
 
         InputStream stream;
         AudioFormat format;
+
+        EventServer fifoServer;
+        if (System.getProperty("fifo") == null) {
+            fifoServer = null;
+        } else {
+            fifoServer = new EventServer(System.getProperty("fifo"));
+        }
+
         if (Arrays.asList(args).contains("--stdin")) {
             stream = System.in;
-            format = FORMAT;
+            if (Arrays.asList(args).contains("--mono")) {
+                format = FORMAT_MONO;
+            } else {
+                format = FORMAT_STEREO;
+            }
         } else {
             RadioStream broadcast = RadioStreamProvider.getStream();
-            if (broadcast.getAudioFormat().matches(FORMAT)) {
+            if (broadcast.getAudioFormat().matches(FORMAT_STEREO)) {
                 format = broadcast.getAudioFormat();
                 stream = broadcast;
             } else {
-                format = FORMAT;
-                stream = new JSSRCResampler(broadcast.getAudioFormat(), FORMAT, broadcast);
+                format = FORMAT_STEREO;
+                stream = new JSSRCResampler(broadcast.getAudioFormat(), FORMAT_STEREO, broadcast);
             }
         }
 
         MutingPipe pipe = new MutingPipe(format, openingThreshold, closingThreshold);
+
         AnalyserFuse fuse = new AnalyserFuse(new int[] {openingThreshold, closingThreshold});
         pipe.addListener(fuse);
-        new Thread(fuse).start();
+        if (fifoServer != null) {
+            pipe.addListener((id, expectedJingleIndex, levels) -> fifoServer.update((short) IntStream.of(levels).sum(), (byte) ("opening".equals(id) ? 0 : 1)));
+        }
+
+        Thread fuseThread = new Thread(fuse);
+        fuseThread.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            LOG.info("Shutting down");
+            fuseThread.interrupt();
+            try {
+                if (fifoServer != null) {
+                    fifoServer.close();
+                }
+                pipe.close();
+            } catch (IOException e) {
+                LOG.error("Can't close pipe", e);
+            }
+        }));
+
         pipe.copyStream(stream, System.out);
     }
 
@@ -91,7 +124,7 @@ public class HeadlessMain {
                         break;
                     }
                 } catch (InterruptedException e) {
-                    LOG.error("Interrupted fuse loop", e);
+                    LOG.info("Interrupted fuse loop");
                     break;
                 }
             }

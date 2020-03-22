@@ -10,7 +10,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import eu.rekawek.analyzer.AnalysisListener;
 import eu.rekawek.radioblock.standalone.stream.RadioStream;

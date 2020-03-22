@@ -41,7 +41,7 @@ public class MutingPipe implements Closeable {
 
         executorService.submit(() -> safeLoop());
         AnalyzerBuilder builder = new AnalyzerBuilder();
-        builder.setChannels(2);
+        builder.setChannels(format.getChannels());
         builder.setMultiplexingStrategy(MultiplexingStrategy.AVERAGE);
         builder.addJingle("opening", getJingleStream("start", rate), openingThreshold);
         builder.addJingle("closing", getJingleStream("end", rate), closingThreshold);
@@ -51,6 +51,7 @@ public class MutingPipe implements Closeable {
 
     private synchronized void onJingle(int jingleIndex) {
         if (mos != null) {
+            LOG.info("Got jingle {}", jingleIndex);
             if (jingleIndex == 0) {
                 mos.setVolumeLevel(0.01f);
             } else {
@@ -81,7 +82,11 @@ public class MutingPipe implements Closeable {
             case 44100:
                 return "44.1k";
             case 48000:
-                return "48k";
+                if (format.getChannels() == 1) {
+                    return "48k-mono";
+                } else {
+                    return "48k";
+                }
             default:
                 throw new IllegalArgumentException("Not supported rate: " + rate);
         }

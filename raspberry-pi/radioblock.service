@@ -1,0 +1,14 @@
+[Unit]
+Description=Radio block service
+After=sound.target
+
+[Service]
+ExecStart=/bin/bash -e /home/pi/run-radioblock.sh
+WorkingDirectory=/home/pi
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
+
+[Install]
+WantedBy=multi-user.target
